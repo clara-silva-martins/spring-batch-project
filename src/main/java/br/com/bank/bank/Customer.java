@@ -3,7 +3,6 @@ package br.com.bank.bank;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 
 
 @Entity
@@ -19,6 +18,9 @@ public class Customer {
     private Double amount;
     @Column
     private LocalDate referenceMonth;
+    private Integer amountMinimumSalaries;
+
+
 
     public String getName() {
         return name;
@@ -74,5 +76,13 @@ public class Customer {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getAmountMinimumSalaries() {
+        return amountMinimumSalaries;
+    }
+
+    public void setAmountMinimumSalaries(Integer amountMinimumSalaries) {
+        this.amountMinimumSalaries = amountMinimumSalaries;
     }
 }

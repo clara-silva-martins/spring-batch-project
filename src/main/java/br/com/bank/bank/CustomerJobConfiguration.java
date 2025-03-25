@@ -6,6 +6,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
@@ -45,6 +46,7 @@ public class CustomerJobConfiguration {
         return new StepBuilder("file-reading", jobRepository)
                 .<Customer, Customer>chunk(200, transactionManager)
                 .reader(reader)
+                .processor(processor())
                 .writer(writer)
                 .build();
 
@@ -69,13 +71,18 @@ public class CustomerJobConfiguration {
         return new JdbcBatchItemWriterBuilder<Customer>()
                 .dataSource(dataSource)
                 .sql("""
-                        INSERT INTO customer (name, cpf, agency, account, amount, reference_month) VALUES (:name, :cpf, :agency, :account, :amount, :referenceMonth)
+                        INSERT INTO customer (name, cpf, agency, account, amount, reference_month, amount_minimum_salaries) VALUES (:name, :cpf, :agency, :account, :amount, :referenceMonth, :amountMinimumSalaries)
                         
                         """)
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
                 .build();
 
 
+    }
+
+    @Bean
+    public CustomerProcessor processor(){
+        return new CustomerProcessor();
     }
 
 }
