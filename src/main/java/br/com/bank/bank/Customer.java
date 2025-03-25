@@ -3,6 +3,7 @@ package br.com.bank.bank;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 
 @Entity
@@ -16,6 +17,7 @@ public class Customer {
     private Integer agency;
     private String account;
     private Double amount;
+    @Column
     private LocalDate referenceMonth;
 
     public String getName() {

@@ -9,19 +9,16 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
+
 
 @Configuration
 public class CustomerJobConfiguration {
@@ -30,7 +27,7 @@ public class CustomerJobConfiguration {
     private final PlatformTransactionManager transactionManager;
 
 
-    public CustomerJobConfiguration(DataSourceTransactionManager transactionManager) {
+    public CustomerJobConfiguration(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
@@ -38,6 +35,7 @@ public class CustomerJobConfiguration {
     public Job job(Step firstStep, JobRepository jobRepository) {
         return new JobBuilder("payments", jobRepository)
                 .start(firstStep)
+
                 .incrementer(new RunIdIncrementer())
                 .build();
     }
@@ -61,6 +59,7 @@ public class CustomerJobConfiguration {
                 .delimiter("|")
                 .names("name", "cpf", "agency", "account", "amount", "referenceMonth")
                 .fieldSetMapper(new CustomerMapper())
+                .linesToSkip(1)
                 .build();
 
     }
@@ -70,7 +69,7 @@ public class CustomerJobConfiguration {
         return new JdbcBatchItemWriterBuilder<Customer>()
                 .dataSource(dataSource)
                 .sql("""
-                        INSERT INTO customer (name, cpf, agency, account, amount, referenceMonth) VALUES (:name, :cpf, :agency, :account, :amount, :referenceMonth)
+                        INSERT INTO customer (name, cpf, agency, account, amount, reference_month) VALUES (:name, :cpf, :agency, :account, :amount, :referenceMonth)
                         
                         """)
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
